@@ -1,4 +1,8 @@
+
 # read_ITRDB_rawData
+
+[![DOI](https://zenodo.org/badge/625965443.svg)](https://zenodo.org/badge/latestdoi/625965443)
+
 An R script to import all International Tree-Ring Data Bank (ITRDB) chronology sites and their associated raw data files from the World Data Service for Paleoclimatology at NOAA's National Centers for Environmental Information.
 
 WARNING: This script relies heavily on internet connectivity between your computer and the NOAA NCEI servers. Any lags in quality or speed will make progress difficult. At best, the script takes several minutes to run.
