@@ -7,9 +7,9 @@ An R script to import all International Tree-Ring Data Bank (ITRDB) chronology s
 
 WARNING: This script relies heavily on internet connectivity between your computer and the NOAA NCEI servers. Any lags in quality or speed will make progress difficult. At best, the script takes several minutes to run.
 
-The script executes a search for all tree-ring files on the ITRDB via the WDS-Paleo API, then builds a tidy data.frame of the metadata. It uses this site-level metadata to create a second metadata table for all of the raw measurement files (there could be >1 per site). Based on the raw files metadata, it uses `dplR::read.tucon()` to import all raw measurement files (.rwl format).
+The script executes a search for all tree-ring files on the ITRDB via the WDS-Paleo API, then builds a tidy data.frame of the metadata. It uses this site-level metadata to create a second metadata table for all of the raw measurement files (there could be >1 per site). Based on the raw files metadata, it uses `dplR::read.tuscon()` to import all raw measurement files (.rwl format).
 
-There are three resultant objects:
+It will return three data objects in your R console:
  * `itrdb_site_meta` Metadata for each site on the ITRDB
  * `itrdb_rawmeas_files` Metadata for each specific raw measurement file on the ITRDB
  * `all_rwl` A nested data.frame including the raw measurement files as read by `dplr::read.tucson()`
@@ -19,6 +19,5 @@ Users should note that the .rwl files are "nested" into a data.frame. If this ob
 Contact me (christopher.guiterman [at] noaa.gov) with any questions for issues.
 And, as you would your datasets, and packages, please cite this script if you're using it in your research! 
 
-happy coding,
-Chris
+happy coding!
 
