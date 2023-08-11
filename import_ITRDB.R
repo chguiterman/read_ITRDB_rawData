@@ -128,14 +128,44 @@ read_itrdb_rwl <- function(first_year, fileUrl) {
   } else read.rwl(fileUrl, format = "tucson")
 }
 
+
+# clean up
+rm(in_list, itrdb_list, resp, p_dat, parsed)
+
 # Read rwls from the HTTPS server
 all_rwl <- itrdb_rawmeas_files %>% 
   transmute(NOAAStudyId,
             RWL = future_map2(first_year, fileUrl,
                        ~ try(read_itrdb_rwl(.x, .y)),
                        .options = furrr_options(seed = TRUE),
-                       .progress = TRUE)
-            )
+                       .progress = TRUE))
 
-# clean up
-rm(in_list, itrdb_list, resp, p_dat, parsed)
+check_files <- all_rwl %>% 
+  mutate(check = map_chr(RWL, ~{
+           # if (class(.x) %in% "try-error") {
+           #   out <- .x[[1]]
+           # }
+           if ("rwl" %in% class(.x)) {
+             out <- "Good"
+           } else out = "Error"
+           out
+         })
+  ) %>% 
+  filter(check == "Error")
+
+
+# 4. Output data -------------------------------------------------------------
+
+# save rwl files in folder
+
+dir.create("RWL")
+out_dat <- all_rwl[1:10, ] %>% 
+  filter(! NOAAStudyId %in% check_files$NOAAStudyId) %>% 
+  inner_join(itrdb_rawmeas_files, by = "NOAAStudyId")
+walk2(out_dat$RWL, out_dat$linkText, ~ write.tucson(.x, str_glue("RWL/{.y}")))
+
+# Save metadata files
+write_csv(itrdb_rawmeas_files, "ITRDB_raw_measurement_files.csv")
+write_csv(itrdb_site_meta, "ITRDB_site_metadata.csv")
+  
+  
