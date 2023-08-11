@@ -2,6 +2,7 @@
 ## 1. ITRDB study metadata
 ## 2. ITRDB list of raw measurement files
 ## 3. Dataframe of rwl files
+## 4. Output and save metadata and rwl files
 
 library(dplR)
 library(httr)
@@ -140,6 +141,9 @@ all_rwl <- itrdb_rawmeas_files %>%
                        .options = furrr_options(seed = TRUE),
                        .progress = TRUE))
 
+# Sometimes sites are loaded on the ITRDB before the data are released,
+# triggering access errors in the script above. This check_files will identify
+# those so they can be removed form further use, as below
 check_files <- all_rwl %>% 
   mutate(check = map_chr(RWL, ~{
            # if (class(.x) %in% "try-error") {
