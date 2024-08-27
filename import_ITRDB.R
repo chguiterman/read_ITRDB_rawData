@@ -7,7 +7,11 @@
 library(dplR)
 library(httr)
 library(jsonlite)
-library(tidyverse)
+library(dplyr)
+library(purrr)
+library(tidyr)
+library(stringr)
+library(admisc)
 library(lubridate)
 library(furrr)
 plan(multisession)
@@ -15,6 +19,8 @@ plan(multisession)
 # Ping WDS-Paleo API
 url <- "https://www.ncei.noaa.gov/paleo-search/study/search.json?metadataOnly=true&dataPublisher=NOAA&dataTypeId=18"
 
+## This step can take some time depending on your internet connection and the
+## status of the NOAA NCEI webpages
 resp <- GET(url)
 
 parsed <- fromJSON(content(resp, "text", encoding = "UTF-8"),
@@ -133,9 +139,9 @@ read_itrdb_rwl <- function(first_year, fileUrl) {
 # clean up
 rm(in_list, itrdb_list, resp, p_dat, parsed)
 
-# Read rwls from the HTTPS server
+# Read rwls from the HTTPS server. This is SLOW
 all_rwl <- itrdb_rawmeas_files %>% 
-  transmute(NOAAStudyId,
+  transmute(NOAAStudyId, linkText,
             RWL = future_map2(first_year, fileUrl,
                        ~ try(read_itrdb_rwl(.x, .y)),
                        .options = furrr_options(seed = TRUE),
@@ -143,7 +149,7 @@ all_rwl <- itrdb_rawmeas_files %>%
 
 # Sometimes sites are loaded on the ITRDB before the data are released,
 # triggering access errors in the script above. This check_files will identify
-# those so they can be removed form further use, as below
+# those so they can be removed from further use, as below
 check_files <- all_rwl %>% 
   mutate(check = map_chr(RWL, ~{
            # if (class(.x) %in% "try-error") {
@@ -163,10 +169,13 @@ check_files <- all_rwl %>%
 # save rwl files in folder
 
 dir.create("RWL")
-out_dat <- all_rwl[1:10, ] %>% 
+out_dat <- all_rwl %>% 
   filter(! NOAAStudyId %in% check_files$NOAAStudyId) %>% 
-  inner_join(itrdb_rawmeas_files, by = "NOAAStudyId")
-walk2(out_dat$RWL, out_dat$linkText, ~ write.tucson(.x, str_glue("RWL/{.y}")))
+  mutate(ndec = map_dbl(RWL, ~ numdec(.x[, 1]))) %>% # check precision from 1st series
+  inner_join(itrdb_rawmeas_files, join_by(NOAAStudyId, linkText))
+pwalk(list(out_dat$RWL, out_dat$linkText, out_dat$ndec), 
+      ~ write.tucson(..1, str_glue("RWL/{..2}"), 
+                     prec = if_else(..3 < 3, 0.01, 0.001)))
 
 # Save metadata files
 write_csv(itrdb_rawmeas_files, "ITRDB_raw_measurement_files.csv")
