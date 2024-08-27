@@ -2,6 +2,7 @@
 # read_ITRDB_rawData
 
 [![DOI](https://zenodo.org/badge/625965443.svg)](https://zenodo.org/badge/latestdoi/625965443)
+[![Hits](https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2Fchguiterman%2Fread_ITRDB_rawData&count_bg=%2379C83D&title_bg=%23555555&icon=&icon_color=%23E7E7E7&title=page+visits&edge_flat=false)](https://hits.seeyoufarm.com)
 
 An R script to import all International Tree-Ring Data Bank (ITRDB) chronology sites and their associated raw data files from the World Data Service for Paleoclimatology at NOAA's National Centers for Environmental Information.
 
