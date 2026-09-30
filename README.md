@@ -8,7 +8,13 @@ WARNING: This script relies heavily on internet connectivity between your comput
 
 The script executes a search for all tree-ring files on the ITRDB via the WDS-Paleo API, then builds a tidy data.frame of the metadata. It uses this site-level metadata to create a second metadata table for all of the raw measurement files (there could be \>1 per site). Based on the raw files metadata, it uses `dplR::read.tuscon()` to import all raw measurement files (.rwl format).
 
-It will return three data objects in your R console: \* `itrdb_site_meta` Metadata for each site on the ITRDB \* `itrdb_rawmeas_files` Metadata for each specific raw measurement file on the ITRDB \* `all_rwl` A nested data.frame including the raw measurement files as read by `dplr::read.tucson()`
+It will return three data objects in your R console:
+
+-   `itrdb_site_meta` Metadata for each site on the ITRDB
+
+-   `itrdb_rawmeas_files` Metadata for each specific raw measurement file on the ITRDB
+
+-   `all_rwl` A nested data.frame including the raw measurement files as read by `dplr::read.tucson()`
 
 Users should note that the .rwl files are "nested" into a data.frame. If this object format is unfamiliar, please refer to <https://bookdown.org/Maxine/r4ds/nesting.html> and other online resources.
 
