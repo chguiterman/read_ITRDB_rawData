@@ -66,8 +66,10 @@ get_ITRDB_Meta <- function(itrdb_list) {
   out_coords <- out_df %>%
     select(NOAAStudyId) %>%
     mutate(coords = pluck(itrdb_list, "geo", "geometry", "coordinates"),
-           c_n = map_dbl(coords, length),
-           latitude = map2_dbl(c_n, coords, 
+           elevation = as.numeric(pluck(itrdb_list, "geo", "properties", "minElevationMeters")),
+           c_n = map_dbl(coords, length)) %>% 
+    filter(c_n > 1) %>% # Drop any sites without coordinates.
+    mutate(latitude = map2_dbl(c_n, coords, 
                                ~ {
                                  if (.x == 2) {as.numeric(.y[1])}
                                  else mean(as.numeric(.y[1]),
@@ -78,8 +80,7 @@ get_ITRDB_Meta <- function(itrdb_list) {
                                   if (.x == 2) {as.numeric(.y[2])}
                                   else mean(as.numeric(.y[3]),
                                             as.numeric(.y[4]))
-                                }),
-           elevation = as.numeric(pluck(itrdb_list, "geo", "properties", "minElevationMeters"))
+                                })
     ) %>%
     select(-coords, -c_n)
   # Extract species codes
